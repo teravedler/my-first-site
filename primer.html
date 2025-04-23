@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <ul class="matrix">
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+    </ul>
+    <script>
+        const matrixFontSize = '24px';
+        const matrixLineHeight = '24px';
+        const matrixColor = 'rgba(0, 255, 0, 0.5)';
+        const matrixWidth = 48;
+        const matrixHeight = 36;
+        const matrixCharacters = 'Л О Х Л О Х Л О Х Л О Х Л О Х Л О Х Л О Х Л О Х Л О Х Л О Х'.split(' ');
+
+        function randomCharacter() {
+            return matrixCharacters[Math.floor(Math.random() * matrixCharacters.length)];
+        }
+
+        function newColumn(height) {
+            return Array.from({ length: height }, () => randomCharacter());
+        }
+
+        // Настройка body
+        document.body.style = `
+  font-family: courier;
+  background: black;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+`;
+
+        // Настройка .matrix
+        document.querySelector('.matrix').style = `
+  display: block;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  color: ${matrixColor};
+  font-size: ${matrixFontSize};
+  line-height: ${matrixLineHeight};
+  overflow: hidden;
+  width: 100%;
+  white-space: nowrap;
+`;
+
+        // Создаем style элемент для CSS
+        const style = document.createElement('style');
+        document.head.appendChild(style);
+
+        // Обрабатываем каждый li
+        for (let i = 1; i <= matrixWidth; i++) {
+            const li = document.querySelector(`.matrix li:nth-child(${i})`);
+            if (!li) continue;
+
+            // Генерация параметров для столбца
+            const columnHeight = Math.floor(Math.random() * (matrixHeight - 3)) + 4;
+            const columnPositionStart = Math.floor(Math.random() * (matrixHeight - 1)) + 1;
+            const column = newColumn(matrixHeight);
+
+            // Создаем CSS-анимацию для столбца
+            const keyframeName = `column-${i}`;
+            let keyframes = `@keyframes ${keyframeName} {\n`;
+            let currentPosition = columnPositionStart;
+
+            for (let frame = 1; frame <= matrixHeight; frame++) {
+                const percent = ((frame - 1) / matrixHeight * 100).toFixed(2) + '%';
+                keyframes += `${percent} {\n`;
+                keyframes += `  background-position: 0 ${matrixLineHeight * (currentPosition - columnHeight)}px;\n`;
+                keyframes += `  padding-top: ${matrixLineHeight * (currentPosition - 1)}px;\n`;
+                keyframes += `}\n`;
+
+                currentPosition += 2;
+                if (currentPosition > matrixHeight) currentPosition -= matrixHeight;
+            }
+            keyframes += '}\n';
+
+            // Добавляем анимацию в style
+            style.sheet.insertRule(keyframes, style.sheet.cssRules.length);
+
+            // Настройка li
+            li.style.position = 'relative';
+            li.style.display = 'inline-block';
+            li.style.verticalAlign = 'top';
+            li.style.whiteSpace = 'normal';
+
+            // Создаем элементы для содержимого и анимации
+            const beforeDiv = document.createElement('div');
+            beforeDiv.style = `
+    display: flex;
+    width: 1em;
+  `;
+            beforeDiv.textContent = column.join('');
+            li.appendChild(beforeDiv);
+
+            const afterDiv = document.createElement('div');
+            afterDiv.style = `
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    color: white;
+    padding-top: ${matrixLineHeight * (columnPositionStart - 1)}px;
+    overflow: hidden;
+    animation: ${matrixHeight * 25}ms ${keyframeName} infinite steps(1, start);
+    background: linear-gradient(rgba(0,0,0,1) 0, rgba(0,0,0,0) ${matrixLineHeight * (columnHeight - 1)}px, rgba(0,0,0,1) ${matrixLineHeight * (columnHeight - 1)}px, rgba(0,0,0,1) ${matrixLineHeight * matrixHeight}px);
+    background-repeat: repeat;
+    background-position: 0 ${matrixLineHeight * (columnPositionStart - columnHeight)}px;
+  `;
+            afterDiv.textContent = column[columnPositionStart - 1] || '';
+            li.appendChild(afterDiv);
+        }
+    </script>
+</body>
+
+</html>
